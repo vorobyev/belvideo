@@ -8,12 +8,13 @@ use app\validators\UserValidator;
 use yii\helpers\Url;
 
 class User extends ActiveRecord
-{      
+{  
+    public $captcha;
     public $password_repeat;
     public function rules() 
     {
         return [
-            [['name', 'password', 'email', 'password_repeat'], 'required', 'message' => 'Поле обязательно для заполнения'],
+            [['name', 'password', 'email', 'password_repeat','captcha'], 'required', 'message' => 'Поле обязательно для заполнения'],
             ['email', 'email', 'message' => 'Неправильно введен e-mail'],
             ['name', 'string', 'min' => '6', 'max' => '32', 'tooShort' => 'Логин должен содержать не менее 6 символов', 'tooLong' => 'Логин должен содержать не более 32 символов'],
             ['name', UserValidator::className()],
@@ -21,6 +22,7 @@ class User extends ActiveRecord
             ['name','unique','message' => 'Пользователь с таким именем уже существует'],
             ['email','unique','message' => 'Пользователь с таким email уже существует'],
             ['password_repeat', 'compare', 'compareAttribute' => 'password', 'message'=>'Пароли должны быть равны'],
+            ['captcha','captcha','message'=>'Код с картинки введен неправильно']
             ];
     }
 
