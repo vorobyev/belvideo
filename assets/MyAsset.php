@@ -3,6 +3,6 @@ namespace app\assets;
 use yii\web\AssetBundle;
 
 class MyAsset Extends AssetBundle{
-    public $baseUrl='@web';
+    public $sourcePath='@app';
     public $js=['assets/my.js'];
 }
