@@ -5,12 +5,14 @@ use Yii;
 use yii\web\Controller;
 use app\models\User;
 use app\models\ConfirmUser;
+use app\models\ModelAddress;
 
 class UserController extends Controller {
     public function actionAdd()
     {   
         $model = new User();
-        if ($model->load(Yii::$app->request->post()) && $model->validate()){
+        $address = new ModelAddress();
+        if ($model->load(Yii::$app->request->post())&& $address->load(Yii::$app->request->post()) && $address->validate() && $model->validate()){
             if ($model->save()){
                 return $this->render('regSuccess',[
                 'model' => $model,
@@ -23,7 +25,8 @@ class UserController extends Controller {
         } else {
             return $this->render('registration',[
             'model' => $model,
-        ]);
+            'address'=>$address
+            ]);
         }
     }
     

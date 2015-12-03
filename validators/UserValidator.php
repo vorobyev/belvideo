@@ -1,7 +1,6 @@
 <?php
 namespace app\validators;
 
-use Yii;
 use yii\validators\Validator;
 
 class UserValidator extends Validator {

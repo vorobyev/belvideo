@@ -11,13 +11,6 @@ class User extends ActiveRecord
 {  
     public $captcha;
     public $password_repeat;
-    public $area;
-    public $hiddenRegion;
-    public $hiddenArea;
-    public $hiddenCity;
-    public $hiddenLocality;
-    public $locality;
-    public $city;
     
     public function rules() 
     {

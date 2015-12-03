@@ -18,6 +18,7 @@ $this->title = 'My Yii Application';
 
         <div class="row">
             <div class="col-lg-4">
+                <a href="http://localhost/basic/web/index.php?r=user/add">Добавить пользователя</a>
                 <h2>Heading</h2>
 
                 <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et

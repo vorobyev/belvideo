@@ -1,6 +1,6 @@
-function getPopupAddress (id,value,type, parentName, regionId, areaId, cityId, localityId, areaIdReal, cityIdReal, localityIdReal){
+function getPopupAddress (id,value,type, parentName, regionId, areaId, cityId, localityId, streetId, areaIdReal, cityIdReal, localityIdReal, streetIdReal){
         $.ajax({
-            url: 'http://localhost/basic/web/index.php?r=address/city',
+            url: 'http://localhost/basic/web/index.php?r=address/get-address',
             type: 'post',
             data: {
                 'data':value,
@@ -8,12 +8,11 @@ function getPopupAddress (id,value,type, parentName, regionId, areaId, cityId, l
                 'region':$('[name="'+parentName+'['+regionId+']"]').val(),
                 'area':$('[name="'+parentName+'['+areaId+']"]').val(),
                 'city':$('[name="'+parentName+'['+cityId+']"]').val(),
-                'locality': $('[name="'+parentName+'['+localityId+']"]').val()
+                'locality':$('[name="'+parentName+'['+localityId+']"]').val(),
+                'street':$('[name="'+parentName+'['+streetId+']"]').val()
             },
             success: function (response) {
-
                 response=$.parseJSON(response);
- 
                 switch(type) {
                     case 1:
                         $('[name="'+parentName+'['+regionId+']"]').val('00');
@@ -26,6 +25,9 @@ function getPopupAddress (id,value,type, parentName, regionId, areaId, cityId, l
                         break;
                     case 4:
                         $('[name="'+parentName+'['+localityId+']"]').val('000');
+                        break;
+                    case 5:
+                        $('[name="'+parentName+'['+streetId+']"]').val('0000');
                         break;
                 } 
                 var objAddress={};
@@ -53,18 +55,25 @@ function getPopupAddress (id,value,type, parentName, regionId, areaId, cityId, l
                             case 4:
                                 $('[name="'+parentName+'['+localityId+']"]').val(ui.item.id.substring(8,11));
                                 break;
+                            case 5:
+                                $('[name="'+parentName+'['+streetId+']"]').val(ui.item.id.substring(11,15));
+                                break;                               
                         }
                         if (areaIdReal!==undefined) {
                             $('[name="'+parentName+'['+areaIdReal+']"]').val("");
-                            $('#hidden'+ucwords(areaIdReal)).val("000");
+                            $('#code'+ucwords(areaIdReal)).val("000");
                         }
                         if (cityIdReal!==undefined) {
                             $('[name="'+parentName+'['+cityIdReal+']"]').val("");
-                            $('#hidden'+ucwords(cityIdReal)).val("000");
+                            $('#code'+ucwords(cityIdReal)).val("000");
                         }
                         if (localityIdReal!==undefined) {
                             $('[name="'+parentName+'['+localityIdReal+']"]').val("");
-                            $('#hidden'+ucwords(localityIdReal)).val("000");
+                            $('#code'+ucwords(localityIdReal)).val("000");
+                        }
+                        if (streetIdReal!==undefined) {
+                            $('[name="'+parentName+'['+streetIdReal+']"]').val("");
+                            $('#code'+ucwords(streetIdReal)).val("0000");
                         }
                     }
                 });
@@ -72,20 +81,24 @@ function getPopupAddress (id,value,type, parentName, regionId, areaId, cityId, l
         }); 
 }
 
-function clearIfBlank (id,parentName,hiddenId,areaId,cityId,localityId) 
+function clearIfBlank (id,parentName,hiddenId,areaId,cityId,localityId,streetId) 
 {
     if (parseInt($('[name="'+parentName+'['+hiddenId+']"]').val())==0) {
         if (areaId!==undefined) {
             $('[name="'+parentName+'['+areaId+']"]').val("");
-            $('#hidden'+ucwords(areaId)).val("000");
+            $('#code'+ucwords(areaId)).val("000");
         }
         if (cityId!==undefined) {
             $('[name="'+parentName+'['+cityId+']"]').val("");
-            $('#hidden'+ucwords(cityId)).val("000");
+            $('#code'+ucwords(cityId)).val("000");
         }
         if (localityId!==undefined) {
             $('[name="'+parentName+'['+localityId+']"]').val("");
-            $('#hidden'+ucwords(localityId)).val("000");
+            $('#code'+ucwords(localityId)).val("000");
+        }
+        if (streetId!==undefined) {
+            $('[name="'+parentName+'['+streetId+']"]').val("");
+            $('#code'+ucwords(streetId)).val("0000");
         }
     $('#'+id).val("");    
     }
