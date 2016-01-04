@@ -1,109 +1,126 @@
-function getPopupAddress (id,value,type, parentName, regionId, areaId, cityId, localityId, streetId, areaIdReal, cityIdReal, localityIdReal, streetIdReal){
-        $.ajax({
-            url: 'http://localhost/basic/web/index.php?r=address/get-address',
-            type: 'post',
-            data: {
-                'data':value,
-                'type':type,
-                'region':$('[name="'+parentName+'['+regionId+']"]').val(),
-                'area':$('[name="'+parentName+'['+areaId+']"]').val(),
-                'city':$('[name="'+parentName+'['+cityId+']"]').val(),
-                'locality':$('[name="'+parentName+'['+localityId+']"]').val(),
-                'street':$('[name="'+parentName+'['+streetId+']"]').val()
-            },
-            success: function (response) {
-                response=$.parseJSON(response);
-                switch(type) {
-                    case 1:
-                        $('[name="'+parentName+'['+regionId+']"]').val('00');
-                        break;
-                    case 2:
-                        $('[name="'+parentName+'['+areaId+']"]').val('000');
-                        break;
-                    case 3:
-                        $('[name="'+parentName+'['+cityId+']"]').val('000');
-                        break;
-                    case 4:
-                        $('[name="'+parentName+'['+localityId+']"]').val('000');
-                        break;
-                    case 5:
-                        $('[name="'+parentName+'['+streetId+']"]').val('0000');
-                        break;
-                } 
-                var objAddress={};
-                var obj = [];
-                for (var index in response){
-                   var objAddress={};
-                   objAddress.label=response[index].name+" "+response[index].descr;
-                   objAddress.id=response[index].id;
-                   obj[obj.length] = objAddress;
-                }
-
-                $('#'+id).autocomplete({
-                    "source":obj,
-                    select: function(event, ui) {
-                        switch(type) {
-                            case 1:
-                                $('[name="'+parentName+'['+regionId+']"]').val(ui.item.id.substring(0,2));
-                                break;
-                            case 2:
-                                $('[name="'+parentName+'['+areaId+']"]').val(ui.item.id.substring(2,5));
-                                break;
-                            case 3:
-                                $('[name="'+parentName+'['+cityId+']"]').val(ui.item.id.substring(5,8));
-                                break;
-                            case 4:
-                                $('[name="'+parentName+'['+localityId+']"]').val(ui.item.id.substring(8,11));
-                                break;
-                            case 5:
-                                $('[name="'+parentName+'['+streetId+']"]').val(ui.item.id.substring(11,15));
-                                break;                               
-                        }
-                        if (areaIdReal!==undefined) {
-                            $('[name="'+parentName+'['+areaIdReal+']"]').val("");
-                            $('#code'+ucwords(areaIdReal)).val("000");
-                        }
-                        if (cityIdReal!==undefined) {
-                            $('[name="'+parentName+'['+cityIdReal+']"]').val("");
-                            $('#code'+ucwords(cityIdReal)).val("000");
-                        }
-                        if (localityIdReal!==undefined) {
-                            $('[name="'+parentName+'['+localityIdReal+']"]').val("");
-                            $('#code'+ucwords(localityIdReal)).val("000");
-                        }
-                        if (streetIdReal!==undefined) {
-                            $('[name="'+parentName+'['+streetIdReal+']"]').val("");
-                            $('#code'+ucwords(streetIdReal)).val("0000");
-                        }
-                    }
-                });
-            }
-        }); 
+function validName(descr,name)
+{
+    var fullName;
+    if (/^(Респ)?(обл)?(г)?(Аобл)?(у)?(п)?(тер)?(х)?(с)?(д)?(ст)?(мкр)?(у)?(м)?(жд_ст)?(ул)?(пер)?(туп)?(пл)?(стр)?(платф)?(ст)?$/i.test(descr)){
+        descr=descr+'.';
+    }
+    
+    if (/^(край)?(обл)?(Аобл)?(АО)?(р-н)?(у)?(с\/с)?(с\/п)?(п\/о)?(с\/мо)?(с\/а)?(дп)?(с\/о)?(x)?(\.)?$/i.test(descr)) {
+        fullName=name+' '+descr;
+    } else {
+        fullName=descr+' '+name;
+    }
+    return fullName;
 }
 
-function clearIfBlank (id,parentName,hiddenId,areaId,cityId,localityId,streetId) 
+
+function clearIfBlank (id,parentName,hiddenId,type) 
 {
     if (parseInt($('[name="'+parentName+'['+hiddenId+']"]').val())==0) {
-        if (areaId!==undefined) {
-            $('[name="'+parentName+'['+areaId+']"]').val("");
-            $('#code'+ucwords(areaId)).val("000");
+        if (type==1) {
+            $('[name="'+parentName+'[area]"]').val("");
+            $('#codeArea').val("000");
         }
-        if (cityId!==undefined) {
-            $('[name="'+parentName+'['+cityId+']"]').val("");
-            $('#code'+ucwords(cityId)).val("000");
+        if (type<=2) {
+            $('[name="'+parentName+'[city]"]').val("");
+            $('#codeCity').val("000");
         }
-        if (localityId!==undefined) {
-            $('[name="'+parentName+'['+localityId+']"]').val("");
-            $('#code'+ucwords(localityId)).val("000");
+        if (type<=3) {
+            $('[name="'+parentName+'[locality]"]').val("");
+            $('#codeLocality').val("000");
         }
-        if (streetId!==undefined) {
-            $('[name="'+parentName+'['+streetId+']"]').val("");
-            $('#code'+ucwords(streetId)).val("0000");
+        if (type<=4) {
+            $('[name="'+parentName+'[street]"]').val("");
+            $('#codeStreet').val("0000");
         }
-    $('#'+id).val("");    
+        $('#'+id).val("");    
     }
 }
 
-function ucwords(string) {  
-    return string.charAt(0).toUpperCase() + string.substr(1);  
-} 
+
+function fillAddress(parentName, name){
+    fillName=($('[name="'+parentName+'[region]"]').val()=="") ? "" : $('[name="'+parentName+'[region]"]').val()+", ";
+    fillName2=($('[name="'+parentName+'[area]"]').val()=="") ? "":$('[name="'+parentName+'[area]"]').val()+", ";
+    fillName3=($('[name="'+parentName+'[city]"]').val()=="") ? "":$('[name="'+parentName+'[city]"]').val()+", ";
+    fillName4=($('[name="'+parentName+'[locality]"]').val()=="") ? "":$('[name="'+parentName+'[locality]"]').val()+", ";
+    fillName5=($('[name="'+parentName+'[street]"]').val()=="") ? "":$('[name="'+parentName+'[street]"]').val()+", ";
+    $('[name="'+parentName+'[address]"]').val((fillName+fillName2+fillName3+fillName4+fillName5).slice(0,-2));
+}
+
+function clearAll(type,parentName)
+{
+    if (type==1) {
+        $('[name="'+parentName+'[area]"]').val("");
+        $('#codeRegion').val("00");               
+    }
+    if (type<=2) {
+        $('[name="'+parentName+'[city]"]').val("");
+        $('#codeArea').val("000");
+    }
+    if (type<=3) {
+        $('[name="'+parentName+'[locality]"]').val("");
+        $('#codeCity').val("000");
+    }
+    if (type<=4) {
+        $('[name="'+parentName+'[street]"]').val("");
+        $('#codeLocality').val("000");
+    }
+    if (type<=5) {
+        $('#codeStreet').val("0000");
+    }
+}
+
+function getSource(request,response)
+{  
+    var now = new Date();
+    $.ajax({
+     url: 'http://localhost/basic/web/index.php?r=address/get-address',
+     type: 'post',
+     data: {
+         'data':this.element.activeElement.value,
+         'type':this.type,
+         'region':$('[name="'+this.parentName+'[codeRegion]"]').val(),
+         'area':$('[name="'+this.parentName+'[codeArea]"]').val(),
+         'city':$('[name="'+this.parentName+'[codeCity]"]').val(),
+         'locality':$('[name="'+this.parentName+'[codeLocality]"]').val(),
+         'street':$('[name="'+this.parentName+'[codeStreet]"]').val()
+     },
+     success: function (responseServer) {
+         var now2 = new Date();
+         now3=now2-now;
+         responseServer=$.parseJSON(responseServer);
+         var objAddress={};
+         var obj = [];
+         for (var index in responseServer){
+            var objAddress={};
+            fullName=validName(responseServer[index].descr,responseServer[index].name);
+            objAddress.label=fullName;
+            objAddress.id=responseServer[index].id;
+            obj[obj.length] = objAddress;
+         }
+         response(obj); 
+        }
+    });            
+                
+}   
+
+function selectActions(event, ui)
+{
+    switch(this.type) {
+        case 1:
+            $('[name="'+this.parentName+'[codeRegion]"]').val(ui.item.id.substring(0,2));
+            break;
+        case 2:
+            $('[name="'+this.parentName+'[codeArea]"]').val(ui.item.id.substring(2,5));
+            break;
+        case 3:
+            $('[name="'+this.parentName+'[codeCity]"]').val(ui.item.id.substring(5,8));
+            break;
+        case 4:
+            $('[name="'+this.parentName+'[codeLocality]"]').val(ui.item.id.substring(8,11));
+            break;
+        case 5:
+            $('[name="'+this.parentName+'[codeStreet]"]').val(ui.item.id.substring(11,15));
+            break;   
+    }
+}
