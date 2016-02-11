@@ -3,6 +3,7 @@ namespace app\assets;
 use yii\web\AssetBundle;
 
 class AddressAsset Extends AssetBundle{
-    public $sourcePath='@app';
-    public $js=['assets/address.js'];
+    public $sourcePath='@app/assets';
+    public $js=['address.js'];
+    public $css=['address.css'];
 }

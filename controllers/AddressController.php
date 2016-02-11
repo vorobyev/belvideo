@@ -8,6 +8,56 @@ use app\models\Kladr;
 use app\models\KladrStreet;
 
 class AddressController extends Controller {
+ 
+    public function actionGeta()
+    {
+        $type=Yii::$app->request->post()["type"];
+        $region=Yii::$app->request->post()["region"];
+        $area=Yii::$app->request->post()["area"];
+        $city=Yii::$app->request->post()["city"];
+        $locality=Yii::$app->request->post()["locality"]; 
+        $obj=[];
+        
+        if ($type<'5') {
+            $address = new KladrStreet();
+            $findStatus = $address->checkAddress($region,$area,$city,$locality);
+            if (!empty($findStatus)) {
+                $obj=  array_merge($obj,['statusStreet'=>1]);
+            } else {
+                $obj=  array_merge($obj,['statusStreet'=>0]);
+            }
+        } 
+        if ($type<'4') {
+            $address = new Kladr();
+            $findStatus = $address->checkLocality($region,$area,$city);
+            if (!empty($findStatus)) {
+                $obj=  array_merge($obj,['statusLocality'=>1]);
+            } else {
+                $obj=  array_merge($obj,['statusLocality'=>0]);
+            }
+        }     
+        if ($type<'3') {
+            $address = new Kladr();
+            $findStatus = $address->checkCity($region,$area);
+            if (!empty($findStatus)) {
+                $obj=  array_merge($obj,['statusCity'=>1]);
+            } else {
+                $obj=  array_merge($obj,['statusCity'=>0]);
+            }
+        }           
+         if ($type<'2') {
+            $address = new Kladr();
+            $findStatus = $address->checkArea($region);
+            if (!empty($findStatus)) {
+                $obj=  array_merge($obj,['statusArea'=>1]);
+            } else {
+                $obj=  array_merge($obj,['statusArea'=>0]);
+            }
+        }         
+        
+        $l=Json::encode($obj);
+        echo $l;
+    }
     
     public function actionGetAddress()
     {   

@@ -1,0 +1,20 @@
+/* 
+    Created on : 11.02.2016, 11:28:28
+    Author     : root
+*/
+
+.myinput {
+    background-repeat: no-repeat;
+    background-position:right;
+}
+
+.mylabel {
+display:inline-block;
+float:left;
+width:160px;
+}
+
+.myDropDown {
+    width:157px;
+    
+}

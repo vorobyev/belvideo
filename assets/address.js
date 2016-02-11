@@ -16,24 +16,30 @@ function validName(descr,name)
 
 function clearIfBlank (id,parentName,hiddenId,type) 
 {
-    if (parseInt($('[name="'+parentName+'['+hiddenId+']"]').val())==0) {
-        if (type==1) {
-            $('[name="'+parentName+'[area]"]').val("");
-            $('#codeArea').val("000");
+    if (flagEmpty==false){
+        if (parseInt($('[name="'+parentName+'['+hiddenId+']"]').val())==0) {
+            if (type==1) {
+                $('[name="'+parentName+'[area]"]').val("");
+                $('#codeArea').val("000");
+            }
+            if (type<=2) {
+                $('[name="'+parentName+'[city]"]').val("");
+                $('#codeCity').val("000");
+            }
+            if (type<=3) {
+                $('[name="'+parentName+'[locality]"]').val("");
+                $('#codeLocality').val("000");
+            }
+            if (type<=4) {
+                $('[name="'+parentName+'[street]"]').val("");
+                $('#codeStreet').val("0000");
+            }
+            $('#'+id).val(""); 
+            setFieldsStatus(type,parentName);
         }
-        if (type<=2) {
-            $('[name="'+parentName+'[city]"]').val("");
-            $('#codeCity').val("000");
-        }
-        if (type<=3) {
-            $('[name="'+parentName+'[locality]"]').val("");
-            $('#codeLocality').val("000");
-        }
-        if (type<=4) {
-            $('[name="'+parentName+'[street]"]').val("");
-            $('#codeStreet').val("0000");
-        }
-        $('#'+id).val("");    
+    } else
+    {
+        
     }
 }
 
@@ -47,32 +53,51 @@ function fillAddress(parentName, name){
     $('[name="'+parentName+'[address]"]').val((fillName+fillName2+fillName3+fillName4+fillName5).slice(0,-2));
 }
 
-function clearAll(type,parentName)
+function clearAll(type,parentName,level)
 {
-    if (type==1) {
-        $('[name="'+parentName+'[area]"]').val("");
-        $('#codeRegion').val("00");               
-    }
-    if (type<=2) {
-        $('[name="'+parentName+'[city]"]').val("");
-        $('#codeArea').val("000");
-    }
-    if (type<=3) {
-        $('[name="'+parentName+'[locality]"]').val("");
-        $('#codeCity').val("000");
-    }
-    if (type<=4) {
-        $('[name="'+parentName+'[street]"]').val("");
-        $('#codeLocality').val("000");
-    }
-    if (type<=5) {
-        $('#codeStreet').val("0000");
+    if (level==0) {
+        if (type==1) {
+            $('[name="'+parentName+'[area]"]').val("");
+            $('#codeRegion').val("00");               
+        }
+        if (type<=2) {
+            $('[name="'+parentName+'[city]"]').val("");
+            $('#codeArea').val("000");
+        }
+        if (type<=3) {
+            $('[name="'+parentName+'[locality]"]').val("");
+            $('#codeCity').val("000");
+        }
+        if (type<=4) {
+            $('[name="'+parentName+'[street]"]').val("");
+            $('#codeLocality').val("000");
+        }
+        if (type<=5) {
+            $('#codeStreet').val("0000");
+        }
+    } else {
+        if (type==1) {
+            $('[name="'+parentName+'[area]"]').val("");
+            $('#codeArea').val("00");               
+        }
+        if (type<=2) {
+            $('[name="'+parentName+'[city]"]').val("");
+            $('#codeCity').val("000");
+        }
+        if (type<=3) {
+            $('[name="'+parentName+'[locality]"]').val("");
+            $('#codeLocality').val("000");
+        }
+        if (type<=4) {
+            $('[name="'+parentName+'[street]"]').val("");
+            $('#codeStreet').val("000");
+        }     
+        
     }
 }
 
 function getSource(request,response)
 {  
-    var now = new Date();
     $.ajax({
      url: 'http://localhost/basic/web/index.php?r=address/get-address',
      type: 'post',
@@ -86,8 +111,6 @@ function getSource(request,response)
          'street':$('[name="'+this.parentName+'[codeStreet]"]').val()
      },
      success: function (responseServer) {
-         var now2 = new Date();
-         now3=now2-now;
          responseServer=$.parseJSON(responseServer);
          var objAddress={};
          var obj = [];
@@ -99,7 +122,13 @@ function getSource(request,response)
             obj[obj.length] = objAddress;
          }
          response(obj); 
-        }
+     },
+     beforeSend: $.proxy(function () {
+         $('#'+this.id).css('background-image','url(\'img/ajax-loader.gif\')');
+     },{'id':this.element.activeElement.id}),
+     complete: $.proxy(function () {
+         $('#'+this.id).css('background-image','none');
+     },{'id':this.element.activeElement.id})
     });            
                 
 }   
@@ -123,4 +152,94 @@ function selectActions(event, ui)
             $('[name="'+this.parentName+'[codeStreet]"]').val(ui.item.id.substring(11,15));
             break;   
     }
+    clearAll(this.type,this.parentName,1);
+    setFieldsStatus(this.type,this.parentName); 
 }
+
+function setFieldsStatus(type,parentName)
+{
+    if (type<5) {
+        $.ajax({
+            url: 'http://localhost/basic/web/index.php?r=address/geta',
+            type: 'post',
+            data: {
+                'type':type,
+                'region':$('[name="'+parentName+'[codeRegion]"]').val(),
+                'area':$('[name="'+parentName+'[codeArea]"]').val(),
+                'city':$('[name="'+parentName+'[codeCity]"]').val(),
+                'locality':$('[name="'+parentName+'[codeLocality]"]').val(),
+                'street':$('[name="'+parentName+'[codeStreet]"]').val()
+            },
+            success: function (responseServer) {
+                responseServer=$.parseJSON(responseServer);
+                statuses=responseServer;
+                if ("statusStreet" in statuses){
+                    if (statuses.statusStreet==0){
+                        $('button#street').attr('disabled',true);
+                        $('input#modeladdress-street').attr('disabled',true);
+                    } else {
+                        $('button#street').attr('disabled',false);
+                        $('input#modeladdress-street').attr('disabled',false);
+                    }
+                } 
+                if ("statusArea" in statuses){
+                    if (statuses.statusArea==0){
+                        $('button#area').attr('disabled',true);
+                        $('input#modeladdress-area').attr('disabled',true);
+                    } else {
+                        $('button#area').attr('disabled',false);
+                        $('input#modeladdress-area').attr('disabled',false);
+                    }
+                }  
+                if ("statusCity" in statuses){
+                    if (statuses.statusCity==0){
+                        $('button#city').attr('disabled',true);
+                        $('input#modeladdress-city').attr('disabled',true);
+                    } else {
+                        $('button#city').attr('disabled',false);
+                        $('input#modeladdress-city').attr('disabled',false);
+                    }
+                } 
+                if ("statusLocality" in statuses){
+                    if (statuses.statusLocality==0){
+                        $('button#locality').attr('disabled',true);
+                        $('input#modeladdress-locality').attr('disabled',true);
+                    } else {
+                        $('button#locality').attr('disabled',false);
+                        $('input#modeladdress-locality').attr('disabled',false);
+                    }
+                } 
+            },
+            beforeSend: $.proxy(function () {
+                if (type<=4) {
+                    $('#modeladdress-street').css('background-image','url(\'img/ajax-loader.gif\')');
+                }
+                if (type<=3) {
+                    $('#modeladdress-locality').css('background-image','url(\'img/ajax-loader.gif\')');
+                }  
+                if (type<=2) {
+                    $('#modeladdress-city').css('background-image','url(\'img/ajax-loader.gif\')');
+                }
+                if (type==1) {
+                    $('#modeladdress-area').css('background-image','url(\'img/ajax-loader.gif\')');
+                }
+            },{'type':type}),
+            complete: $.proxy(function () {
+                if (type<=4) {
+                    $('#modeladdress-street').css('background-image','none');
+                }
+                if (type<=3) {
+                    $('#modeladdress-locality').css('background-image','none');
+                }  
+                if (type<=2) {
+                    $('#modeladdress-city').css('background-image','none');
+                }
+                if (type==1) {
+                    $('#modeladdress-area').css('background-image','none');
+                }
+            },{'type':type})
+        });                       
+    }
+  
+}
+var flagEmpty=false;
