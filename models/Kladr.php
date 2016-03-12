@@ -50,4 +50,17 @@ class Kladr extends ActiveRecord {
     public function checkLocality($region,$area,$city) {
         return self::find()->where(['and',['like','id',$region.$area.$city.'___%',false],['not like','id',$region.$area.$city.'000%',false]])->limit(1)->one();
     }
+    
+    public function findRegion($region) {
+        return self::find()->where(['like','id',$region.'000000000%',false])->limit(1)->one(); 
+    }
+    public function findArea($region,$area) {
+        return self::find()->where(['like','id',$region.$area.'000000%',false])->limit(1)->one(); 
+    }
+    public function findCity($region,$area,$city) {
+        return self::find()->where(['like','id',$region.$area.$city.'000%',false])->limit(1)->one(); 
+    }
+    public function findLocality($region,$area,$city,$locality) {
+        return self::find()->where(['like','id',$region.$area.$locality.'%',false])->limit(1)->one(); 
+    }
 }

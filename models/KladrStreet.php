@@ -26,4 +26,8 @@ class KladrStreet extends ActiveRecord {
     public function checkAddress($region,$area,$city,$locality) {
         return self::find()->where(['and',['like','id',$region.$area.$city.$locality.'%',false],['not like','id',$region.$area.$city.$locality.'0000%',false]])->limit(1)->one();
     }
+    
+    public function findStreet($region,$area,$city,$locality,$street) {
+        return self::find()->where(['like','id',$region.$area.$city.$locality.$street.'%',false])->limit(1)->one();
+    }
 }

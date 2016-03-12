@@ -1,7 +1,7 @@
 <?php
 
 use Yii;
-use yii\helpers\Html;
+use yii\bootstrap\Html;
 use yii\bootstrap\ActiveForm;
 use yii\captcha\Captcha;
 use app\components\Address;
@@ -18,8 +18,18 @@ $this->title = 'Регистрация нового пользователя';
         <?= $form->field($model, 'password_repeat')->passwordInput()->label('Повторите пароль') ?>
         <?= $form->field($model, 'captcha')->widget(Captcha::className(), [])->label('Введите код с картинки (англ.)') ?>
 
-        <?= Address::widget(['form'=>$form,'address'=>$address]) ?>
+        <?php 
+            echo Html::a('Адрес','',[
+                'data-toggle'=>'modal',
+                'data-target'=>'#addressModal',
+                'onclick'=>"fillAddressAll(\"Fact\")"
+                ]);
+            echo Html::endTag("br");
+                
+        ?>
+<?= Html::submitButton('Зарегистироваться')?> 
+  <?php ActiveForm::end(); ?>
+        <?= Address::widget(['form'=>$form,'address'=>$address,'model'=>$model,'for'=>'Fact']) ?>
 
-        <?= Html::submitButton('Зарегистироваться')?>
+        
     
-   <?php ActiveForm::end(); ?>

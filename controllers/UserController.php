@@ -12,7 +12,7 @@ class UserController extends Controller {
     {   
         $model = new User();
         $address = new ModelAddress();
-        if ($model->load(Yii::$app->request->post())&& $address->load(Yii::$app->request->post()) && $address->validate() && $model->validate()){
+        if ($model->load(Yii::$app->request->post())&& $model->validate()){
             if ($model->save()){
                 return $this->render('regSuccess',[
                 'model' => $model,

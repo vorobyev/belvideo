@@ -13,6 +13,65 @@ function validName(descr,name)
     return fullName;
 }
 
+function getAddressText() 
+{
+    addressText="";
+    addressRegion=$('input#modeladdress-region').val();
+    addressArea=$('input#modeladdress-area').val();
+    addressCity=$('input#modeladdress-city').val();
+    addressLocality=$('input#modeladdress-locality').val();
+    addressStreet=$('input#modeladdress-street').val();
+    addressHouse=$('input#house').val();
+    addressCorps=$('input#corps').val();
+    addressFlat=$('input#flat').val();
+    if (addressRegion!=="") {
+        addressText=addressText+addressRegion;
+        if ((addressArea!=="")||(addressCity!=="")||(addressLocality!=="")||(addressStreet!=="")||(addressHouse!=="")||(addressCorps!=="")||(addressFlat!=="")){
+           addressText=addressText+", " 
+        }
+    }
+    if (addressArea!=="") {
+        addressText=addressText+addressArea;
+        if ((addressCity!=="")||(addressLocality!=="")||(addressStreet!=="")||(addressHouse!=="")||(addressCorps!=="")||(addressFlat!=="")){
+           addressText=addressText+", " 
+        }
+    }
+    if (addressCity!=="") {
+        addressText=addressText+addressCity;
+        if ((addressLocality!=="")||(addressStreet!=="")||(addressHouse!=="")||(addressCorps!=="")||(addressFlat!=="")){
+           addressText=addressText+", " 
+        }
+    }
+    if (addressLocality!=="") {
+        addressText=addressText+addressLocality;
+        if ((addressStreet!=="")||(addressHouse!=="")||(addressCorps!=="")||(addressFlat!=="")){
+           addressText=addressText+", " 
+        }
+    }
+    if (addressStreet!=="") {
+        addressText=addressText+addressStreet;
+        if ((addressHouse!=="")||(addressCorps!=="")||(addressFlat!=="")){
+           addressText=addressText+", " 
+        }
+    }
+    if (addressHouse!=="") {
+        addressText=addressText+$("#selectHouse option:selected").text().toLowerCase()+" "+addressHouse;
+        if ((addressCorps!=="")||(addressFlat!=="")){
+           addressText=addressText+", " 
+        }
+    }
+    if (addressCorps!=="") {
+        addressText=addressText+$("#selectCorps option:selected").text().toLowerCase()+" "+addressCorps;
+        if ((addressFlat!=="")){
+           addressText=addressText+", " 
+        }
+    }
+    if (addressFlat!=="") {
+        addressText=addressText+$("#selectFlat option:selected").text().toLowerCase()+" "+addressFlat;
+    }
+    
+    $('textarea#addressText').val(addressText);
+}
 
 function clearIfBlank (id,parentName,hiddenId,type) 
 {
@@ -36,6 +95,7 @@ function clearIfBlank (id,parentName,hiddenId,type)
             }
             $('#'+id).val(""); 
             setFieldsStatus(type,parentName);
+            getAddressText();
         }
     } else
     {
@@ -92,7 +152,7 @@ function clearAll(type,parentName,level)
             $('[name="'+parentName+'[street]"]').val("");
             $('#codeStreet').val("000");
         }     
-        
+      
     }
 }
 
@@ -153,12 +213,12 @@ function selectActions(event, ui)
             break;   
     }
     clearAll(this.type,this.parentName,1);
-    setFieldsStatus(this.type,this.parentName); 
+    setFieldsStatus(this.type,this.parentName);
 }
 
 function setFieldsStatus(type,parentName)
 {
-    if (type<5) {
+    if (type<6) {
         $.ajax({
             url: 'http://localhost/basic/web/index.php?r=address/geta',
             type: 'post',
@@ -209,6 +269,7 @@ function setFieldsStatus(type,parentName)
                         $('input#modeladdress-locality').attr('disabled',false);
                     }
                 } 
+                getAddressText();
             },
             beforeSend: $.proxy(function () {
                 if (type<=4) {
@@ -239,7 +300,43 @@ function setFieldsStatus(type,parentName)
                 }
             },{'type':type})
         });                       
-    }
+    }   
   
 }
+
+function setModelAddressFields (addressName) 
+{
+    addressId=$("input#codeRegion").val()+$("input#codeArea").val()+$("input#codeCity").val()+$("input#codeLocality").val()+$("input#codeStreet").val();
+    $("#address"+addressName+"Id").val(addressId);
+    $("#address"+addressName).val($("textarea#addressText").val());
+    
+    
+    addressText="";
+    addressHouse=$('input#house').val();
+    addressCorps=$('input#corps').val();
+    addressFlat=$('input#flat').val();
+
+    if (addressHouse!=="") {
+        addressText=addressText+$("#selectHouse option:selected").text().toLowerCase()+" "+addressHouse;
+        if ((addressCorps!=="")||(addressFlat!=="")){
+           addressText=addressText+", " 
+        }
+    }
+    if (addressCorps!=="") {
+        addressText=addressText+$("#selectCorps option:selected").text().toLowerCase()+" "+addressCorps;
+        if ((addressFlat!=="")){
+           addressText=addressText+", " 
+        }
+    }
+    if (addressFlat!=="") {
+        addressText=addressText+$("#selectFlat option:selected").text().toLowerCase()+" "+addressFlat;
+    }
+    
+    
+    
+    
+    $("#addressOccur"+addressName).val(addressText);
+}
+
+
 var flagEmpty=false;

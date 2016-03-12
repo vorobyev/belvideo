@@ -11,6 +11,9 @@ class User extends ActiveRecord
 {  
     public $captcha;
     public $password_repeat;
+    public $addressFactId;
+    public $addressFact;
+    public $addressOccurFact;
     
     public function rules() 
     {
@@ -50,7 +53,7 @@ class User extends ActiveRecord
         $keyHash = md5(Yii::$app->params['key'], true);
         $part_str = "prorab-gid|";
         $this->verificationHash = urlencode(base64_encode(mcrypt_encrypt(MCRYPT_RIJNDAEL_256, $keyHash, $part_str.$this->name, MCRYPT_MODE_ECB)));
-        $message='Для активации Вашей учетной записи перейдите по ссылке <br/>'.Url::base(true).'?r=user/confirm&verificationHash='.$this->verificationHash.'<br/>Дата и время отправки сообщения: '.date("Y-m-d H:i:s").'. Код активации действиетелен в течение 15 дней с получения сообщения';
+        $message='Для активации Вашей учетной записи перейдите по ссылке <br/>'.Url::base(true).'?r=user/confirm&verificationHash='.$this->verificationHash.'<br/>Дата и время отправки сообщения: '.date("Y-m-d H:i:s").'. Код активации действителен в течение 15 дней с получения сообщения';
         if ($this->sendMailToUser($message,$this->email)){
             $this->createTime=date("Y-m-d H:i:s");
             $this->active=0;

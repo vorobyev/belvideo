@@ -10,11 +10,24 @@
 
 .mylabel {
 display:inline-block;
-float:left;
 width:160px;
+text-align:left;
 }
 
 .myDropDown {
     width:157px;
     
+}
+
+.mydiv {
+    text-align:left;
+}
+
+
+#addressModal .modal-dialog .modal-content {
+    width:400px;
+}
+
+#addressModal .modal-dialog .modal-content .modal-header{
+    text-align:center;
 }
