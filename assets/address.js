@@ -150,7 +150,7 @@ function clearAll(type,parentName,level)
         }
         if (type<=4) {
             $('[name="'+parentName+'[street]"]').val("");
-            $('#codeStreet').val("000");
+            $('#codeStreet').val("0000");
         }     
       
     }
@@ -220,7 +220,7 @@ function setFieldsStatus(type,parentName)
 {
     if (type<6) {
         $.ajax({
-            url: 'http://localhost/basic/web/index.php?r=address/geta',
+            url: 'http://localhost/basic/web/index.php?r=address/get-address-status',
             type: 'post',
             data: {
                 'type':type,
@@ -338,5 +338,103 @@ function setModelAddressFields (addressName)
     $("#addressOccur"+addressName).val(addressText);
 }
 
+
+function fillAddressAll(addressName)
+{
+    codeRegion=$("#address"+addressName+"Id").val().substring(0,2);
+    codeArea=$("#address"+addressName+"Id").val().substring(2,5);
+    codeCity=$("#address"+addressName+"Id").val().substring(5,8);
+    codeLocality=$("#address"+addressName+"Id").val().substring(8,11);
+    codeStreet=$("#address"+addressName+"Id").val().substring(11,15);
+
+    
+
+        $.ajax({
+            url: 'http://localhost/basic/web/index.php?r=address/get-address-by-number',
+            type: 'post',
+            data: {
+                'region':codeRegion,
+                'area':codeArea,
+                'city':codeCity,
+                'locality':codeLocality,
+                'street':codeStreet
+            },
+            success: function (responseServer) {
+                
+                responseServer=$.parseJSON(responseServer);
+                if (!(responseServer.region.id===undefined)){
+                    $('#modeladdress-region').val(validName(responseServer.region.descr,responseServer.region.name));
+                    $('input#codeRegion').val(responseServer.region.id.substring(0,2));
+                    
+                    if ("id" in responseServer.area){
+                        $('#modeladdress-area').val(validName(responseServer.area.descr,responseServer.area.name));
+                        $('button#area').attr('disabled',false);
+                        $('input#modeladdress-area').attr('disabled',false);
+                        $('input#codeArea').val(responseServer.area.id.substring(2,5));
+                    } else {
+                        if (responseServer.area=="1") {
+                            $('button#area').attr('disabled',false);
+                            $('input#modeladdress-area').attr('disabled',false);
+                        } else {
+                            $('button#area').attr('disabled',true);
+                            $('input#modeladdress-area').attr('disabled',true);                           
+                        }
+                    }
+
+                    
+                    
+                    if (!(responseServer.city.id===undefined)){
+                        $('#modeladdress-city').val(validName(responseServer.city.descr,responseServer.city.name));
+                        $('button#city').attr('disabled',false);
+                        $('input#modeladdress-city').attr('disabled',false);
+                        $('input#codeCity').val(responseServer.city.id.substring(5,8));
+                    } else {
+                        if (responseServer.city=="1") {
+                            $('button#city').attr('disabled',false);
+                            $('input#modeladdress-city').attr('disabled',false);
+                        } else {
+                            $('button#city').attr('disabled',true);
+                            $('input#modeladdress-city').attr('disabled',true);                           
+                        }
+                    }
+                    
+                    if (!(responseServer.locality.id===undefined)){
+                        $('#modeladdress-locality').val(validName(responseServer.locality.descr,responseServer.locality.name));
+                        $('button#locality').attr('disabled',false);
+                        $('input#modeladdress-locality').attr('disabled',false);
+                        $('input#codeLocality').val(responseServer.locality.id.substring(8,11));
+                    } else {
+                        if (responseServer.locality=="1") {
+                            $('button#locality').attr('disabled',false);
+                            $('input#modeladdress-locality').attr('disabled',false);
+                        } else {
+                            $('button#locality').attr('disabled',true);
+                            $('input#modeladdress-locality').attr('disabled',true);                           
+                        }
+                    }
+
+                    if (!(responseServer.street.id===undefined)){
+                        $('#modeladdress-street').val(validName(responseServer.street.descr,responseServer.street.name));
+                        $('button#street').attr('disabled',false);
+                        $('input#modeladdress-street').attr('disabled',false);
+                        $('input#codeStreet').val(responseServer.street.id.substring(11,15));
+                    } else {
+                        if (responseServer.street=="1") {
+                            $('button#street').attr('disabled',false);
+                            $('input#modeladdress-street').attr('disabled',false);
+                        } else {
+                            $('button#street').attr('disabled',true);
+                            $('input#modeladdress-street').attr('disabled',true);                           
+                        }
+                    }                    
+                    
+                }
+                getAddressText();
+                setModelAddressFields(addressName);
+                
+            }
+            });                       
+      
+}
 
 var flagEmpty=false;
