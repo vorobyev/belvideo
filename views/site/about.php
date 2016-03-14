@@ -3,16 +3,24 @@
 /* @var $this yii\web\View */
 
 use yii\helpers\Html;
+use kartik\file\FileInput;
 
-$this->title = 'About';
+$this->title = 'Файлы';
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="site-about">
     <h1><?= Html::encode($this->title) ?></h1>
+<?php    
+echo $form->field($model, 'avatar')->widget(FileInput::classname(), [
+    'options' => ['accept' => 'image/*'],
+]);
 
-    <p>
-        This is the About page. You may modify the following file to customize its content:
-    </p>
-
-    <code><?= __FILE__ ?></code>
+// With model & without ActiveForm
+echo '<label class="control-label">Add Attachments</label>';
+echo FileInput::widget([
+    'model' => $model,
+    'attribute' => 'attachment_1',
+    'options' => ['multiple' => true]
+]);
+?>
 </div>

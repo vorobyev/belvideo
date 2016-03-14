@@ -6,14 +6,12 @@ use Yii;
 use yii\db\ActiveRecord;
 use app\validators\UserValidator;
 use yii\helpers\Url;
+use yii\web\IdentityInterface;
 
-class User extends ActiveRecord
+class User extends ActiveRecord implements IdentityInterface
 {  
     public $captcha;
     public $password_repeat;
-    public $addressFactId;
-    public $addressFact;
-    public $addressOccurFact;
     
     public function rules() 
     {
@@ -57,13 +55,49 @@ class User extends ActiveRecord
         if ($this->sendMailToUser($message,$this->email)){
             $this->createTime=date("Y-m-d H:i:s");
             $this->active=0;
-            $this->authMethodId=1;
+            $this->accessToken="123";
+            $this->authKey="321";
             $this->password=md5($this->password, false);
             return parent::save($runValidation);
         } else {
             $this->addError('mail','Произошла ошибка отправки кода подтверждения на Ваш e-mail. Пожалуйста, попробуйте зарегистрироваться позднее.');
             return false;
         }
+    }
+    
+        public static function findIdentity($id)
+    {
+       return static::findOne($id);
+    }
+
+    public static function findIdentityByAccessToken($token, $type = null)
+    {
+        return static::findOne(['accessToken' => $token]);    
+    }
+
+    public function getId()
+    {
+        return $this->id;
+    }
+
+    public function getAuthKey()
+    {
+        return $this->authKey;
+    }
+
+    public function validateAuthKey($authKey)
+    {
+        return $this->getAuthKey() === $authKey;
+    }
+
+    public function validatePassword($password)
+    {
+        return $this->password === md5($password);
+    }
+    
+    public static function findByUsername($username)
+    {
+        return static::findOne(['name' => $username]);
     }
  }
 

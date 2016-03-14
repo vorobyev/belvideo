@@ -1,0 +1,16 @@
+/* 
+    Created on : 11.02.2016, 11:28:28
+    Author     : root
+*/
+
+.form-group label {
+display:inline-block;
+width:160px;
+text-align:left;
+}
+
+.form-group div input {
+display:inline-block;
+width:500px;
+text-align:left;
+}
