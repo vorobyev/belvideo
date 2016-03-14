@@ -8,6 +8,7 @@ use yii\web\Controller;
 use yii\filters\VerbFilter;
 use app\models\LoginForm;
 use app\models\ContactForm;
+use app\models\File;
 
 class SiteController extends Controller
 {
@@ -88,7 +89,11 @@ class SiteController extends Controller
     }
 
     public function actionAbout()
-    {
-        return $this->render('about');
+    {   
+        $File=new File();
+        return $this->render('about',
+                [
+                    'file'=>$File
+                ]);
     }
 }
