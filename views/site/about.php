@@ -22,9 +22,9 @@ echo '<label class="control-label">Add Attachments</label>';
 echo FileInput::widget([
     'model' => $file,
     'name'=>'file',
-    'options' => ['multiple' => true],
+    'options' => ['multiple' => true,'accept' => 'image/*'],
     'pluginOptions' => [
-//        'uploadUrl' => Url::to(['/site/file-upload']),
+        //'uploadUrl' => Url::to(['/site/file-upload']),
         'uploadExtraData' => [
             'album_id' => 20,
             'cat_id' => 'Nature'
