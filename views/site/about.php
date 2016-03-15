@@ -4,6 +4,7 @@
 
 use yii\helpers\Html;
 use kartik\file\FileInput;
+use yii\helpers\Url;
 
 
 $this->title = 'Файлы';
@@ -21,7 +22,15 @@ echo '<label class="control-label">Add Attachments</label>';
 echo FileInput::widget([
     'model' => $file,
     'name'=>'file',
-    'options' => ['multiple' => true]
+    'options' => ['multiple' => true],
+    'pluginOptions' => [
+//        'uploadUrl' => Url::to(['/site/file-upload']),
+        'uploadExtraData' => [
+            'album_id' => 20,
+            'cat_id' => 'Nature'
+        ],
+    'maxFileCount' => 10
+    ]
 ]);
 ?>
 </div>
