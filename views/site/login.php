@@ -40,13 +40,14 @@ $this->params['breadcrumbs'][] = $this->title;
             'template' => "{hint}<div class=\"myLabelInner\">{beginLabel}{labelTitle}{endLabel}{input}</div>"
         ])->label("Запомнить меня") ?>
 
-        <div class="form-group">
-            <div class="col-lg-offset-1 col-lg-11">
+        <div class="margin10 form-group">
+
                 <?= Html::submitButton('Войти', ['class' => 'btn btn-primary', 'name' => 'login-button']) ?>
-            </div>
+                <?= Html::a('Зарегистрироваться', ['user/add'], ['class' => 'btn btn-success']) ?>
+
         </div>
 
     <?php ActiveForm::end(); ?>
-
+    
 
 </div>

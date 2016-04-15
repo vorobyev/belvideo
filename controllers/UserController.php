@@ -6,6 +6,7 @@ use yii\web\Controller;
 use app\models\User;
 use app\models\ConfirmUser;
 use app\models\ModelAddress;
+use yii\helpers\FileHelper;
 
 class UserController extends Controller {
     public function actionAdd()
@@ -14,6 +15,7 @@ class UserController extends Controller {
         $address = new ModelAddress();
         if ($model->load(Yii::$app->request->post())&& $model->validate()){
             if ($model->save()){
+                FileHelper::createDirectory(Yii::getAlias('@app').'/web/files/pre-actions/'.$model->id);
                 return $this->render('regSuccess',[
                 'model' => $model,
                 ]);

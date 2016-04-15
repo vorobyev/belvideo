@@ -9,6 +9,7 @@ use yii\bootstrap\NavBar;
 use yii\widgets\Breadcrumbs;
 use app\assets\AppAsset;
 use app\assets\ReklamaAsset;
+use yii\helpers\Url;
 
 
 AppAsset::register($this);
@@ -39,13 +40,14 @@ ReklamaAsset::register($this);
     echo Nav::widget([
         'options' => ['class' => 'navbar-nav navbar-right'],
         'items' => [
-            ['label' => 'Домой', 'url' => ['/site/index']],
-            ['label' => 'О нас', 'url' => ['/site/about']],
+            ['label' => 'Главная', 'url' => ['/site/index']],
+            ((Yii::$app->user->isGuest === false)&&(Yii::$app->user->identity->admin === 1))?['label' => 'Точки', 'url' => ['/places/index']]:"",
+            ((Yii::$app->user->isGuest === false)&&(Yii::$app->user->identity->admin === 1))?['label' => 'Пользователи', 'url' => ['/users/index']]:['label' => 'Мои файлы', 'url' => ['/site/files']],
             ['label' => 'Контакты', 'url' => ['/site/contact']],
             Yii::$app->user->isGuest ?
                 ['label' => 'Войти', 'url' => ['/site/login']] :
                 [
-                    'label' => 'Выйти (' . Yii::$app->user->identity->name . ')',
+                    'label' => 'Выйти (' . Yii::$app->user->identity->name. ')',
                     'url' => ['/site/logout'],
                     'linkOptions' => ['data-method' => 'post']
                 ],
@@ -57,6 +59,7 @@ ReklamaAsset::register($this);
     <div class="container">
         <?= Breadcrumbs::widget([
             'links' => isset($this->params['breadcrumbs']) ? $this->params['breadcrumbs'] : [],
+            'homeLink'=>['label'=>'Главная','url'=>Url::to(['site/index'])]
         ]) ?>
         <?= $content ?>
     </div>

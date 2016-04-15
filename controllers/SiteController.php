@@ -9,6 +9,7 @@ use yii\filters\VerbFilter;
 use app\models\LoginForm;
 use app\models\ContactForm;
 use app\models\File;
+use yii\data\ActiveDataProvider;
 
 class SiteController extends Controller
 {
@@ -88,12 +89,22 @@ class SiteController extends Controller
         ]);
     }
 
-    public function actionAbout()
+    public function actionFiles()
     {   
+        $provider = new ActiveDataProvider([
+        'query' => File::find()->where(['userId'=>Yii::$app->user->identity->id]),
+        'pagination' => [
+        'pageSize' => 10,
+         ],
+    ]);
+        
         $File=new File();
+
+        
         return $this->render('about',
                 [
-                    'file'=>$File
+                    'file'=>$File,
+                    'provider'=>$provider
                 ]);
     }
 }

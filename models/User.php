@@ -7,6 +7,7 @@ use yii\db\ActiveRecord;
 use app\validators\UserValidator;
 use yii\helpers\Url;
 use yii\web\IdentityInterface;
+use app\models\Place;
 
 class User extends ActiveRecord implements IdentityInterface
 {  
@@ -55,8 +56,9 @@ class User extends ActiveRecord implements IdentityInterface
         if ($this->sendMailToUser($message,$this->email)){
             $this->createTime=date("Y-m-d H:i:s");
             $this->active=0;
-            $this->accessToken="123";
-            $this->authKey="321";
+            $this->admin=0;
+            $this->accessToken=$this->createTime.$this->name;
+            $this->authKey=$this->createTime.$this->name;
             $this->password=md5($this->password, false);
             return parent::save($runValidation);
         } else {
@@ -95,10 +97,21 @@ class User extends ActiveRecord implements IdentityInterface
         return $this->password === md5($password);
     }
     
+    public function isAdmin()
+    {
+        return $this->admin === 1;
+    }
+    
     public static function findByUsername($username)
     {
         return static::findOne(['name' => $username]);
     }
- }
+    
+    public function getPlace() {
+        return $this->hasMany(Place::className(), ['id' => 'placeId'])
+        ->viaTable('UserRules', ['userId' => 'id']);
+    }
+    
+}
 
 
