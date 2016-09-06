@@ -9,7 +9,7 @@ $config = [
     'components' => [
         'request' => [
             // !!! insert a secret key in the following (if it is empty) - this is required by cookie validation
-            'cookieValidationKey' => 'BJV4CrpsXh3kJ6NwGDC1m77tCzHG7PPw',
+            'cookieValidationKey' => 'BJV4CrpsXh3kJ6NwGDL1m77tCzHG7PPw',
         ],
         'cache' => [
             'class' => 'yii\caching\FileCache',
@@ -34,12 +34,35 @@ $config = [
             'useFileTransport' => false,
         ],
         'log' => [
-            'traceLevel' => YII_DEBUG ? 3 : 0,
+            'traceLevel'=>0,    
             'targets' => [
                 [
                     'class' => 'yii\log\FileTarget',
-                    'levels' => ['error', 'warning'],
+                    'levels' => ['error'],
+                    'logFile' => '@app/runtime/logs/error.log',
+                    'logVars' => []
                 ],
+                [
+                    'class' => 'yii\log\FileTarget',
+                    'levels' => ['warning'],
+                    'logFile' => '@app/runtime/logs/warning.log',
+                    'logVars' => []
+                ],
+                [
+                    'class' => 'yii\log\FileTarget',
+                    'levels' => ['info'],
+                    'logFile' => '@app/runtime/logs/info.log',
+                    'logVars' => [],
+                    'except' => [
+                        'yii\*'
+                    ],
+                ],
+//                [
+//                    'class' => 'yii\log\FileTarget',
+//                    'levels' => ['trace'],
+//                    'logFile' => '@app/runtime/logs/trace.log',
+//                    'logVars' => []
+//                ],
             ],
         ],
         'db' => require(__DIR__ . '/db.php'),

@@ -53,6 +53,11 @@ class SiteController extends Controller
     {
         return $this->render('index');
     }
+    
+    public function actionAbout()
+    {
+        return $this->render('about');
+    }
 
     public function actionLogin()
     {
@@ -62,6 +67,7 @@ class SiteController extends Controller
 
         $model = new LoginForm();
         if ($model->load(Yii::$app->request->post()) && $model->login()) {
+            Yii::info('Пользователь '.$model->name.' вошел',__METHOD__);
             return $this->goBack();
         }
         return $this->render('login', [
@@ -71,15 +77,18 @@ class SiteController extends Controller
 
     public function actionLogout()
     {
+        Yii::info('Пользователь '.Yii::$app->user->identity->name.' вышел',__METHOD__);
         Yii::$app->user->logout();
-
+        
         return $this->goHome();
     }
-
+    
+    //форма обратной связи
     public function actionContact()
     {
         $model = new ContactForm();
         if ($model->load(Yii::$app->request->post()) && $model->contact(Yii::$app->params['adminEmail'])) {
+            Yii::info('Отправлено письмо администратору от '.$model->name,__METHOD__);
             Yii::$app->session->setFlash('contactFormSubmitted');
 
             return $this->refresh();
@@ -88,23 +97,28 @@ class SiteController extends Controller
             'model' => $model,
         ]);
     }
-
+    
+    //страница для загрузки файлов пользователем
     public function actionFiles()
     {   
-        $provider = new ActiveDataProvider([
-        'query' => File::find()->where(['userId'=>Yii::$app->user->identity->id]),
-        'pagination' => [
-        'pageSize' => 10,
-         ],
-    ]);
-        
-        $File=new File();
+        if ((Yii::$app->user->isGuest === false)&&(Yii::$app->user->identity->admin != 1)) { //в админе эта страница недоступна
+            $provider = new ActiveDataProvider([
+                'query' => File::find()->where(['userId'=>Yii::$app->user->identity->id]),
+                'pagination' => [
+                'pageSize' => 10,
+                 ],
+            ]);
 
-        
-        return $this->render('about',
-                [
-                    'file'=>$File,
-                    'provider'=>$provider
-                ]);
+            $File=new File();
+
+
+            return $this->render('load',
+                    [
+                        'file'=>$File,
+                        'provider'=>$provider
+                    ]);
+        } else {
+            return $this->render('error',[]);
+        }  
     }
 }

@@ -18,7 +18,7 @@ $provider = new ActiveDataProvider([
 ]);
 
 
-
+echo "<span class='label label-info'>Нажмите на пользователя, чтобы увидеть разрешенные для него точки</span></br></br>";
 echo GridView::widget([
     'dataProvider' => $provider,
     'columns' => [

@@ -7,21 +7,21 @@
 
 use yii\helpers\Html;
 
-$this->title = $name;
+$this->title = 'Ошибка';
 ?>
 <div class="site-error">
 
     <h1><?= Html::encode($this->title) ?></h1>
 
     <div class="alert alert-danger">
-        <?= nl2br(Html::encode($message)) ?>
+
+
+
+    <p>
+        Произошла ошибка во время обработки сервером Вашего запроса. 
+    </p>
+    <p>
+        Возможно, у Вас недостаточно прав на просмотр этой страницы, либо страница не существует. Вы можете обратиться к нам с помощью <?php echo Html::a("формы обратной связи",['site/contact']);?>
+    </p>
     </div>
-
-    <p>
-        The above error occurred while the Web server was processing your request.
-    </p>
-    <p>
-        Please contact us if you think this is a server error. Thank you.
-    </p>
-
 </div>

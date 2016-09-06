@@ -2,14 +2,34 @@
 
 use wbraganca\videojs\VideoJsWidget;
 use yii\helpers\Html;
+$name = "Файлы";
+if (Yii::$app->user->identity->admin === 1) {
+    $filesFlag = Yii::$app->request->get()['files'];
+    if ($filesFlag == 'false') {
+       $name = "Заявки"; 
+    }
+}
 
 $this->title = $video->fileName;
-$this->params['breadcrumbs'][] = ['label' => 'Файлы', 'url' => ['site/files']];
+if ($video->videoBlock != 1) {
+    $this->params['breadcrumbs'][] = ((Yii::$app->user->identity->admin === 1))?['label' => $name, 'url' => ['/files/admin','userId'=>'all','files'=>$filesFlag]]:['label' => 'Файлы', 'url' => ['site/files']];
+} else {
+    if (Yii::$app->user->identity->admin === 1){
+        $this->params['breadcrumbs'][] = ['label' => 'Видео-блоки точек', 'url' => ['files/admin-videoblocks']];
+    }
+}
+
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="site-about">
-    <h1><?= Html::encode($this->title) ?></h1>
+    <h2><?= Html::encode($this->title) ?></h2>
 <?php
+if ((Yii::$app->user->identity->admin === 1)&&($video->videoBlock != 1)) {
+    echo "<h3>ID пользователя: ".$video->userId."</h3>";
+} else if ((Yii::$app->user->identity->admin === 1)&&($video->videoBlock == 1))
+{
+    echo "<h3>Видеоблок: id=".$video->id."</h3>";
+}
 echo VideoJsWidget::widget([
         'options' => [
             'class' => 'video-js vjs-default-skin vjs-big-play-centered',
@@ -20,7 +40,7 @@ echo VideoJsWidget::widget([
         ],
         'tags' => [
             'source' => [
-                ['src' => 'files/pre-actions/'.Yii::$app->user->identity->id."/".$video->href.".".$video->ext, 'type' => 'video/mp4']
+                ['src' => 'files/pre-actions/'.$video->userId."/".$video->href.".".$video->ext, 'type' => 'video/mp4']
             ]
         ]
     ]);

@@ -1,4 +1,4 @@
-<?php
+    <?php
 
 /* @var $this \yii\web\View */
 /* @var $content string */
@@ -10,6 +10,7 @@ use yii\widgets\Breadcrumbs;
 use app\assets\AppAsset;
 use app\assets\ReklamaAsset;
 use yii\helpers\Url;
+use app\models\FilePlace;
 
 
 AppAsset::register($this);
@@ -31,26 +32,43 @@ ReklamaAsset::register($this);
 <div class="wrap">
     <?php
     NavBar::begin([
-        'brandLabel' => 'My Company',
+        'brandLabel' => 'Advertising portal',
         'brandUrl' => Yii::$app->homeUrl,
         'options' => [
             'class' => 'navbar-inverse navbar-fixed-top',
         ],
     ]);
+    
+    $proposal = FilePlace::find()->where(['confirm'=>0]);
+    $count = (string)$proposal->Count();
+    
     echo Nav::widget([
         'options' => ['class' => 'navbar-nav navbar-right'],
         'items' => [
             ['label' => 'Главная', 'url' => ['/site/index']],
             ((Yii::$app->user->isGuest === false)&&(Yii::$app->user->identity->admin === 1))?['label' => 'Точки', 'url' => ['/places/index']]:"",
-            ((Yii::$app->user->isGuest === false)&&(Yii::$app->user->identity->admin === 1))?['label' => 'Пользователи', 'url' => ['/users/index']]:['label' => 'Мои файлы', 'url' => ['/site/files']],
-            ['label' => 'Контакты', 'url' => ['/site/contact']],
+            ((Yii::$app->user->isGuest === false)&&(Yii::$app->user->identity->admin === 1))?['label' => 'Пользователи', 'items'=>[
+                    ['label' => 'Точки пользователей','url' => ['/users/index']],
+                    ['label' => 'Промо-коды','url' => ['/users/promo']]
+                ]
+            ]
+            
+            :((Yii::$app->user->isGuest === false)?['label' => 'Мои файлы', 'url' => ['/site/files']]:""),
+            ((Yii::$app->user->isGuest === false)&&(Yii::$app->user->identity->admin === 1))?['label' => 'Файлы', 'items'=>[
+                ['label'=>'Файлы пользователей','url' => ($count == '0')?['/files/admin','userId'=>'all','files'=>'true']:['/files/admin','userId'=>'all','files'=>'false']],
+                ['label'=>'Видео-блоки точек','url' => ['/files/admin-videoblocks']],
+                ['label'=>'Плейлисты','url'=>['/files/playlists']
+            ]]]:['label' => 'Контакты', 'items'=>[
+                ['label'=>'О нас','url' => ['/site/about']],
+                ['label'=>'Обратная связь','url' => ['/site/contact']]    
+                    ]],
             Yii::$app->user->isGuest ?
                 ['label' => 'Войти', 'url' => ['/site/login']] :
                 [
                     'label' => 'Выйти (' . Yii::$app->user->identity->name. ')',
                     'url' => ['/site/logout'],
                     'linkOptions' => ['data-method' => 'post']
-                ],
+                ]
         ],
     ]);
     NavBar::end();
@@ -67,7 +85,7 @@ ReklamaAsset::register($this);
 
 <footer class="footer">
     <div class="container">
-        <p class="pull-left">&copy; My Company <?= date('Y') ?></p>
+        <p class="pull-left">&copy; Advertising portal <?= date('Y') ?></p>
 
         <p class="pull-right"><?= "" ?></p>
     </div>

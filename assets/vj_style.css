@@ -40,7 +40,7 @@ text-align:left;
 }
 
 .grid-view {
-    max-width:1000px;
+    max-width:1050px;
     margin:0 auto;
 }
 
@@ -67,12 +67,14 @@ text-align:left;
     font-family: Verdana;
     font-size: 10pt;
     font-weight:bold;
+    word-break:break-all; 
 }
 
 .place-address {
     font-family: Verdana;
     font-size: 8pt;
     font-style: italic;
+    word-break:break-all; 
 }
 
 .places-container {
@@ -154,4 +156,83 @@ div.wrapper-table {
 
 .modal-open {
     overflow:auto;
+}
+
+.wait {
+    
+}
+
+.file-name {
+    font-family: Verdana;
+    font-size: 8pt;
+    font-weight:bold;
+}
+
+.file-info {
+    font-family: Verdana;
+    font-size: 7pt;
+    font-style: italic;
+}
+
+.filesFolder li { 
+    padding:0px;
+}
+
+.filesFolder{
+    width:250px;
+}
+
+.filesPlaylist{
+    width:300px;
+    background:#7080D7;
+}
+
+.filesPlaylist li { 
+    padding:0px;
+}
+
+.files-user{
+    background:#FFB273;
+    color:black;
+}
+
+.files-blocks{
+    background:#5CCCCC;
+    color:black;
+}
+
+#modal-playlist .modal-dialog .modal-content {
+    min-height: 600px;
+}
+
+.btn-my {
+    padding-left:5px;
+    padding-right:5px;
+    padding-top:0px;
+    padding-bottom:0px;
+}
+
+.p-indent{
+    text-indent: 15px;
+}
+
+#img-help *{
+    max-width:80%;
+}
+
+#img-help{
+    text-align:center;
+}
+
+a.no_decor {
+    text-decoration: none;
+    color: #084B8A;
+}
+
+a.no_decor:hover {
+    color: #084B8A;
+}
+
+#text-CPU {
+    color:blue;
 }

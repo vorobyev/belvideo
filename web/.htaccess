@@ -1,0 +1,5 @@
+RewriteEngine on
+ 
+
+# Otherwise forward the request to index.php
+RewriteRule . index.php

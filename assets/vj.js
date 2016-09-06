@@ -1,3 +1,4 @@
+var myVar;
 //вспомогательная функция вывода объекта
 function dump(obj) {
     var out = "";
@@ -228,7 +229,7 @@ function viewVideo(href){
 }
 
 
-function changeUserFiles (id) {
+function changeUserFiles (id, admin) {
     id = id.replace('btn','');
     is_confirm = false;
     massJSON = new Object();
@@ -261,7 +262,12 @@ function changeUserFiles (id) {
                     success: function (responseServer) {
                         //responseServer=$.parseJSON(responseServer);
                         $('#alertPlace'+fileId).css('display','block');
-                        $('#alertPlace'+fileId).html("Изменения успешно сохранены! О порядке и сроках подтверждения файлов Вы можете прочитать <a href='_blank'>здесь</a>");
+                        if (admin == 0) {
+                            mail = "Изменения успешно сохранены! О порядке и сроках подтверждения файлов Вы можете прочитать <a href='_blank'>здесь</a>";
+                        } else {
+                            mail = "Изменения успешно сохранены! Для дальнейшей работы с неподтвержденными файлами перейдите в раздел 'Заявки'"
+                        }
+                        $('#alertPlace'+fileId).html(mail);
                         
                            $('.cell'+id).each(function(i,elem) {
                                 id3 = $(elem).attr('id').replace('cell','');
@@ -302,8 +308,13 @@ function changeUserFiles (id) {
             success: function (responseServer) {
                 //responseServer=$.parseJSON(responseServer);
                         $('#alertPlace'+fileId).css('display','block');
-                        $('#alertPlace'+fileId).html("Изменения успешно сохранены! О порядке и сроках подтверждения файлов Вы можете прочитать <a href='_blank'>здесь</a>");
-                            $('.cell'+id).each(function(i,elem) {
+                        if (admin == 0) {
+                            mail = "Изменения успешно сохранены! О порядке и сроках подтверждения файлов Вы можете прочитать <a href='_blank'>здесь</a>";
+                        } else {
+                            mail = "Изменения успешно сохранены! Для дальнейшей работы с неподтвержденными файлами перейдите в раздел 'Заявки'"
+                        }
+                        $('#alertPlace'+fileId).html(mail);
+                        $('.cell'+id).each(function(i,elem) {
                                 id3 = $(elem).attr('id').replace('cell','');
                                 mass = id3.split('_');
                                 confirmMes = mass[3];
@@ -332,6 +343,7 @@ function changeUserFiles (id) {
     
 
 }
+
     function changeColorOnCheck (id) {
         id = id.replace('cell',''); 
         mass = id.split('_');
@@ -348,3 +360,320 @@ function changeUserFiles (id) {
         }
 
     }
+    
+   
+
+
+function changeVideoblocks (id) {
+    id = id.replace('btn','');
+    massJSON = new Object();
+    $('.cell'+id).each(function(i,elem) {
+         id2 = $(elem).attr('id').replace('cell','');
+         mass = id2.split('_');
+         confirmMes = mass[3];
+
+         userId = mass[0];
+         place = mass[1];
+         fileId = mass[2];
+         val = $(elem).val();
+         if (((val == 1)&&(confirmMes == 'null'))||((val == 0)&&(confirmMes == '1'))) {
+            massJSON[place] = val;
+        }
+    });
+    
+
+    $.ajax({
+       url: window.location.protocol+"//"+window.location.hostname+window.location.pathname+'?r=files/rewrite-playlist',
+       type: 'post',
+       data: {
+           places : JSON.stringify(massJSON),
+           file : fileId
+       },
+       beforeSend: function(){
+           $('#alertPlace'+fileId).css('display','block');
+           mail = "<img src='img/ajax-loader.gif'/> Ожидайте, выполняются операции с файлами на сервере"
+           $('#alertPlace'+fileId).html(mail);
+       },
+       success: function (responseServer) {
+           responseServer=$.parseJSON(responseServer);
+           if (responseServer.success) {
+           //$('#alertPlace'+fileId).css('display','block');
+
+            mail = "Изменения успешно сохранены! Добавленные видео-блоки помещены в конец списка плэйлиста. <a href="+window.location.protocol+"//"+window.location.hostname+window.location.pathname+'?r=files/playlists'+">Перейти к плейлистам</a>" ;
+
+           $('#alertPlace'+fileId).html(mail);
+
+              $('.cell'+id).each(function(i,elem) {
+                   id3 = $(elem).attr('id').replace('cell','');
+                   mass = id3.split('_');
+                   confirmMes = mass[3];
+                   place = mass[1];
+                   fileId = mass[2];
+                   el = $('[id*=tr'+place+"_"+fileId+']');
+                   el.css('background','none');
+
+                   val = $(elem).val();
+                   if (val == 1) {
+                       $('#al'+place+"_"+fileId+"_1").css('display','inline');
+                       $(elem).attr('id','cell'+mass[0]+"_"+place+"_"+fileId+"_1");
+                   } 
+                   if ((val == 0)) {
+                       $('#al'+place+"_"+fileId+"_1").css('display','none');
+                       $(elem).attr('id','cell'+mass[0]+"_"+place+"_"+fileId+"_null");
+                   } 
+
+               });
+           } else {
+               alert(responseServer.msg);
+           }    
+       }
+      }); 
+}
+
+function coding(id) {
+    if (confirm("Привести видеофайл к нужному формату?")) {
+        $.ajax({
+           url: window.location.protocol+"//"+window.location.hostname+window.location.pathname+'?r=files/coding',
+           type: 'post',
+           data: {
+               file : id
+           },
+           success: function (responseServer) {
+               if (responseServer != "error") {
+                    $('#modal-convert').modal('show');
+                     status = "";
+                     myVar = setInterval(function(){
+                         status = $.ajax({
+                             url: window.location.protocol+"//"+window.location.hostname+window.location.pathname+'?r=files/check-file',
+                             async: false,
+                             type: 'post',
+                             data: {
+                             }
+                         }).responseText; 
+
+                         $.ajax({
+                             url: window.location.protocol+"//"+window.location.hostname+window.location.pathname+'?r=files/check-cpu',
+                             //async: false,
+                             type: 'post',
+                             data: {
+                             },
+                             success: function (responseServer) {
+                                 $('#text-CPU').html(responseServer);
+                             }
+                         });                        
+
+
+                         $('#text-load').html(status);
+                         if (status.indexOf('endfile') != -1){
+                             $.ajax({
+                                 url: window.location.protocol+"//"+window.location.hostname+window.location.pathname+'?r=files/after-coding',
+                                 type: 'post',
+                                 data: {
+                                     file : id
+                                 },
+                                 success: function (responseServer) {
+
+
+
+                                 }
+                             }); 
+                             soundClick();
+                             clearInterval(myVar);
+                             $('#modal-convert').modal('hide');
+                             location.reload();
+                         }
+                     },2000); 
+                } else {
+                    alert("Файл уже был преобразован ранее!");
+                }
+           }
+          });                
+    }
+}
+
+function soundClick() {
+  var audio = new Audio(); // Создаём новый элемент Audio
+  audio.src = 'sound.mp3'; // Указываем путь к звуку "клика"
+  audio.autoplay = true; // Автоматически запускаем
+}
+
+function addToPlaylist (id2,placeIdMy,fileIdMy) {
+    id = id2;
+    id = id.replace('btn','');
+    mass = id.split('_');
+    placeId = mass[1];
+    fileId = mass[0];    
+    
+    $.ajax({
+           url: window.location.protocol+"//"+window.location.hostname+window.location.pathname+'?r=files/rewrite-playlist-prop',
+           type: 'post',
+           data: {
+               place : placeId,
+               file : fileId
+           },
+           beforeSend: function(){
+               $('#'+id2).attr('disabled','true');
+               id = id2.replace('btn','btncancel');
+               $('#'+id).attr('disabled','true');
+               mail = "<img src='img/ajax-loader.gif'/> Ожидайте"
+               $('#'+id2).html(mail);
+           },
+           success: function (responseServer) {
+               responseServer=$.parseJSON(responseServer);
+               if (responseServer.success) {
+                //$('#alertPlace'+fileId).css('display','block');
+                    mail = "Подтверждено";
+                    $('#'+id2).html(mail);
+                    $("#play"+placeIdMy).attr("href",$("#play"+placeIdMy).attr("href")+"&fid="+fileIdMy); 
+                    $("#play"+placeIdMy).click();
+
+               } else {
+                   alert(responseServer.msg);
+               }    
+           }
+          });
+    
+
+}
+
+function delProp (id2) {
+
+    id = id2;
+    id = id.replace('btncancel','');
+    mass = id.split('_');
+    placeId = mass[1];
+    fileId = mass[0]; 
+    $.ajax({
+       url: window.location.protocol+"//"+window.location.hostname+window.location.pathname+'?r=files/delete-prop',
+       type: 'post',
+       data: {
+           place : placeId,
+           file : fileId
+       },
+       beforeSend: function(){
+           mail = "<img src='img/ajax-loader.gif'/> Ожидайте";
+           $('#'+id2).attr('disabled','true');
+           id3 = id2.replace('btncancel','btn');
+           $('#'+id3).attr('disabled','true');
+           $('#'+id2).html(mail);
+       },
+       success: function (responseServer) {
+           responseServer=$.parseJSON(responseServer);
+           if (responseServer.success) {
+           //$('#alertPlace'+fileId).css('display','block');
+
+            mail = "Удалено";
+            $('#'+id2).html(mail);
+            $('#mail-abort').val('Вы подали заявку на размещение в точке '+$('#placef'+placeId).html()+' файла '+$('#namef'+fileId).html()+', но Вам было отказано по следующей причине:\r\n - \r\nС уважением, администратор');
+            $('#btnsend').html('Отправить пользователю '+$('#emailf'+fileId).html()+' на e-mail');
+            $('#btnsend').attr('id','btnsend'+fileId);
+            $('#modal-not_agree').modal('show');
+
+
+           } else {
+               alert(responseServer.msg);
+           }    
+       }
+      });    
+}
+
+function addToPL(id) {
+    id = id.replace('btn','');
+    mass = id.split('_');
+    id = mass[0];
+    flag = mass[1];
+    if (flag == '1') {
+        $('#filesPlaylist').append('<li id="file'+id+'" role="option" aria-grabbed="false" draggable="true"><div class="files-blocks"><table style="width:100%;"><tbody><tr><td style="width:90%; word-break: break-all;"><div class="file-name">'+$('#filename'+id).html()+'</div><div class="file-info">'+$('#fileinfo'+id).html()+'</div></td><td style="text-align:center"><button type="button" id="btn'+id+'" class="btn btn-danger btn-my" onclick="delPL(this);">x</button></td></tr></tbody></table></div></li>');
+    } else {
+        $('#filesPlaylist').append('<li id="file'+id+'" role="option" aria-grabbed="false" draggable="true"><div class="files-user"><table style="width:100%;"><tbody><tr><td style="width:90%; word-break: break-all;"><div class="file-name">'+$('#filename'+id).html()+'</div><div class="file-info">'+$('#fileinfo'+id).html()+'</div></td><td style="text-align:center"><button type="button" id="btn'+id+'" class="btn btn-danger btn-my" onclick="delPL(this);">x</button></td></tr></tbody></table></div></li>');
+    }
+    $('#filesPlaylist').sortable();
+}
+
+function delPL(id) {
+    node = id.parentElement.parentElement.parentElement.parentElement.parentElement.parentElement;
+    $(node).remove();
+    $('#filesPlaylist').sortable();
+}
+
+function savePlaylist(pl){
+    $('#filesPlaylist');
+    massJSON = new Object();
+    sort = 1;
+    $('#filesPlaylist').children().each(function(i,elem) {
+        massJSON[sort] = $(elem).attr('id').replace('file','');
+        
+        sort+=1;
+    });
+    
+    $.ajax({
+            url: window.location.protocol+"//"+window.location.hostname+window.location.pathname+'?r=files/write-playlist',
+            type: 'post',
+            data: {
+                files : JSON.stringify(massJSON),
+                place : pl
+            },
+            beforeSend: function(){
+                $('#save-playlist').html("<img src='img/ajax-loader.gif'/> Сохранение плейлиста");
+                $('#save-playlist').attr('disabled',true);
+            },
+            success: function (responseServer) {
+                $('#save-playlist').attr('disabled',false);
+                $('#save-playlist').html("Сохранить плейлист");
+                $('#alert-playlist').css('display','block');
+                setTimeout("$('#alert-playlist').css('display','none');",2000);
+            }           
+           }); 
+    
+
+}
+
+function sendMailToUser(id){
+    fileId = id.replace('btnsend','');
+    $.ajax({
+            url: window.location.protocol+"//"+window.location.hostname+window.location.pathname+'?r=files/send-mail-to-user',
+            type: 'post',
+            data: {
+                id : fileId,
+                mail : $('#mail-abort').val()
+            },
+            beforeSend: function(){
+                mail = "<img src='img/ajax-loader.gif'/> Идет отправка письма, ожидайте";
+                $('#btnsend'+fileId).attr('disabled',true);
+                $('#btnnotsend').attr('disabled',true);
+                $('#btnsend'+fileId).html(mail);
+            },
+            success: function (responseServer) {
+                $('#btnsend'+fileId).attr('disabled',false);
+                $('#btnnotsend').attr('disabled',false);
+                $('#btnsend'+fileId).attr('id','btnsend');
+                $('#modal-not_agree').modal('hide');
+            }           
+    });    
+    
+} 
+
+function generatePromo(){
+    $.ajax({
+            url: window.location.protocol+"//"+window.location.hostname+window.location.pathname+'?r=files/generate-promo',
+            type: 'post',
+            data: {},
+            success: function (responseServer) {
+                location.reload();
+            }           
+    });        
+}
+
+
+function deletePromo(id){
+    $.ajax({
+            url: window.location.protocol+"//"+window.location.hostname+window.location.pathname+'?r=files/delete-promo',
+            type: 'post',
+            data: {
+                id : id,
+            },
+            success: function (responseServer) {
+                location.reload();
+            }           
+    });        
+}
