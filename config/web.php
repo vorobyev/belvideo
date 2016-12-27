@@ -1,6 +1,7 @@
 <?php
 
 $params = require(__DIR__ . '/params.php');
+$pass = require(__DIR__ . '/pass.php');
 
 $config = [
     'id' => 'basic',
@@ -27,7 +28,6 @@ $config = [
                 'class' => 'Swift_SmtpTransport',
                 'host' => 'smtp.gmail.com',  // e.g. smtp.mandrillapp.com or smtp.gmail.com
                 'username' => 'vorobyev.it@gmail.com',
-                'password' => 'h6b5g4v3f2d1',
                 'port' => '587', // Port 25 is a very common port too
                 'encryption' => 'tls', // It is often used, check your provider or mail server specs
             ],
@@ -66,6 +66,7 @@ $config = [
             ],
         ],
         'db' => require(__DIR__ . '/db.php'),
+
     ],
     'params' => $params,
 ];
@@ -82,5 +83,7 @@ $config = [
 //        'class' => 'yii\gii\Module',
 //    ];
 //}
+
+$config['components']['mailer']['transport'] = $config['components']['mailer']['transport']+$pass;
 
 return $config;
